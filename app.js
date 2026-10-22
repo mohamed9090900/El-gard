@@ -1,6 +1,6 @@
 'use strict';
 /* جرد البوفيه — standalone local-first PWA. Does not fetch/mutate old buffet data. */
-const VERSION='1.2.0';
+const VERSION='1.3.2';
 const SEED_STATE={"schema":1,"categories":[{"id":"cat-seed-1","name":"بسكوت و كيك"},{"id":"cat-seed-2","name":"شاي و قهوة"},{"id":"cat-seed-3","name":"شيبسي و فشار"},{"id":"cat-seed-4","name":"كانز و عصير"},{"id":"cat-seed-5","name":"مأكولات"}],"products":[{"id":"product-seed-1-1","name":"اوريو صغير","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-1","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-2","name":"اوريو كبير","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-2","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-3","name":"اولكر شاي صغير","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-3","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-4","name":"اولكر شاي كبير","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-4","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-5","name":"اولكر عجوة","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-5","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-6","name":"بسكريم","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-6","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-7","name":"بسكوت شوفان","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-7","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-8","name":"بسكوت هالي","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-8","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-9","name":"توينكز صغير","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-9","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-10","name":"توينكز كبير","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-10","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-11","name":"فرسكا","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-11","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-12","name":"مولتو","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-12","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-13","name":"هوهوز كينج","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-13","unit":"","price":""}],"deleted":false},{"id":"product-seed-2-1","name":"اعشااب","categoryId":"cat-seed-2","variants":[{"id":"variant-seed-2-1","unit":"","price":""}],"deleted":false},{"id":"product-seed-2-2","name":"شاي","categoryId":"cat-seed-2","variants":[{"id":"variant-seed-2-2","unit":"","price":""}],"deleted":false},{"id":"product-seed-2-3","name":"قهوة","categoryId":"cat-seed-2","variants":[{"id":"variant-seed-2-3","unit":"","price":""}],"deleted":false},{"id":"product-seed-2-4","name":"كوفي ميكس","categoryId":"cat-seed-2","variants":[{"id":"variant-seed-2-4","unit":"","price":""}],"deleted":false},{"id":"product-seed-2-5","name":"نمرة سكر","categoryId":"cat-seed-2","variants":[{"id":"variant-seed-2-5","unit":"","price":""}],"deleted":false},{"id":"product-seed-2-6","name":"نيسكافيه 3 في 1","categoryId":"cat-seed-2","variants":[{"id":"variant-seed-2-6","unit":"","price":""}],"deleted":false},{"id":"product-seed-3-1","name":"دوريتوس","categoryId":"cat-seed-3","variants":[{"id":"variant-seed-3-1","unit":"","price":""}],"deleted":false},{"id":"product-seed-3-2","name":"شيبسى","categoryId":"cat-seed-3","variants":[{"id":"variant-seed-3-2","unit":"","price":""}],"deleted":false},{"id":"product-seed-3-3","name":"شيتوس","categoryId":"cat-seed-3","variants":[{"id":"variant-seed-3-3","unit":"","price":""}],"deleted":false},{"id":"product-seed-3-4","name":"صن بايتس","categoryId":"cat-seed-3","variants":[{"id":"variant-seed-3-4","unit":"","price":""}],"deleted":false},{"id":"product-seed-3-5","name":"فشار","categoryId":"cat-seed-3","variants":[{"id":"variant-seed-3-5","unit":"","price":""}],"deleted":false},{"id":"product-seed-4-1","name":"عصير","categoryId":"cat-seed-4","variants":[{"id":"variant-seed-4-1","unit":"","price":""}],"deleted":false},{"id":"product-seed-4-2","name":"كانز","categoryId":"cat-seed-4","variants":[{"id":"variant-seed-4-2","unit":"","price":""}],"deleted":false},{"id":"product-seed-4-3","name":"مياه كبيرة","categoryId":"cat-seed-4","variants":[{"id":"variant-seed-4-3","unit":"","price":""}],"deleted":false},{"id":"product-seed-5-1","name":"إندومي","categoryId":"cat-seed-5","variants":[{"id":"variant-seed-5-1","unit":"","price":""}],"deleted":false},{"id":"product-seed-5-2","name":"كاستر","categoryId":"cat-seed-5","variants":[{"id":"variant-seed-5-2","unit":"","price":""}],"deleted":false}],"audits":[],"draft":null,"importCompleted":true,"isDemo":false};
 const DB_KEY='gard_elbuffet_v1_state';
 const META_KEY='gard_elbuffet_v1_sync';
@@ -24,7 +24,8 @@ let state=loadJson(DB_KEY,deepClone(SEED_STATE));
 const defaultProfit=()=>({entries:[{id:'officers',name:'حساب الضباط',amount:'',sign:1},{id:'wallet',name:'فلوس المحفظة',amount:'',sign:1},{id:'cash',name:'فلوس الكاش',amount:'',sign:1},{id:'debt',name:'الدين اللي عليك',amount:'',sign:-1},{id:'capital',name:'رأس المال',amount:'',sign:-1}],hospitality:''});
 if(!state.profit||!Array.isArray(state.profit.entries))state.profit=defaultProfit();
 let sync=loadJson(META_KEY,initialSync());
-let cloud=loadJson(CLOUD_KEY,{url:'',key:'',email:''});
+let cloud=loadJson(CLOUD_KEY,{url:'https://mxdriltuyfovbuswbhfh.supabase.co',key:'sb_publishable_OQZckLE9CVgBEt8LIZH28Q_4L3hJqMV',email:''});
+cloud.url='https://mxdriltuyfovbuswbhfh.supabase.co';cloud.key='sb_publishable_OQZckLE9CVgBEt8LIZH28Q_4L3hJqMV';
 let token=loadJson(TOKEN_KEY,null);
 let page='current',selectedAudit=null,editAudit=null,editBuffer=null,query='',hasTabCollision=false,lastSavedAt=0;
 let toastTimeout;
@@ -34,7 +35,7 @@ function persist(markDirty=true){if(hasTabCollision){notice('البرنامج م
   try{localStorage.setItem(DB_KEY,JSON.stringify(state));localStorage.setItem(META_KEY,JSON.stringify(sync));lastSavedAt=Date.now();updateIndicators();return true}
   catch(err){notice('تعذر الحفظ على الجهاز. صدّر نسخة احتياطية قبل المتابعة.');console.error(err);return false}}
 function updateIndicators(){const d=$('#sync-dot');if(d)d.classList.toggle('clean',!sync.dirty);const status=$('#save-status');if(status)status.textContent=sync.dirty?'محفوظ محليًا • ينتظر المزامنة':'محفوظ محليًا'}
-function saveCloudSettings(){localStorage.setItem(CLOUD_KEY,JSON.stringify(cloud))}
+function saveCloudSettings(){cloud.url='https://mxdriltuyfovbuswbhfh.supabase.co';cloud.key='sb_publishable_OQZckLE9CVgBEt8LIZH28Q_4L3hJqMV';localStorage.setItem(CLOUD_KEY,JSON.stringify(cloud))}
 function saveToken(){if(token)localStorage.setItem(TOKEN_KEY,JSON.stringify(token));else localStorage.removeItem(TOKEN_KEY)}
 function ensureDraft(){if(state.draft)return;state.draft={id:uniqueId(),startedAt:new Date().toISOString(),rows:state.products.filter(p=>!p.deleted).map(makeRow)};persist(false)}
 function makeRow(p){return{id:p.id,name:p.name,categoryId:p.categoryId||null,categoryName:catName(p.categoryId),variants:p.variants.map(v=>({id:v.id,unit:v.unit,price:v.price??'',qty:''}))}}
@@ -201,8 +202,9 @@ function deleteCategory(id){const c=state.categories.find(c=>c.id===id);if(!c)re
 function deleteProduct(id){const p=state.products.find(p=>p.id===id);if(!p)return;
  if(!confirm(`حذف «${p.name}» من الجرد الجديد؟\nهيفضل موجود في كل الجردات القديمة ومش هتتغير قيمتها.`))return;
  p.deleted=true;touchRowFromProduct(p);persist();render();notice('الصنف اتحذف من الجرد الجديد فقط؛ الأرشيف محفوظ.')}
-function addVariant(id){const p=state.products.find(p=>p.id===id);if(!p)return;const unit='';if(!unit){notice('كل الوحدات المتاحة مستخدمة لهذا الصنف.');return}
- p.variants.push({id:uniqueId(),unit,price:''});touchRowFromProduct(p);persist();render();notice('اتضاف سطر للعبوة الجديدة. اكتب سعرها وكميتها.')}
+function addVariant(id){const p=state.products.find(p=>p.id===id);if(!p)return;
+ // Add an unselected packaging row. The user chooses its unit, quantity and price.
+ p.variants.push({id:uniqueId(),unit:'',price:''});touchRowFromProduct(p);persist();render();notice('اتضاف سطر جديد. اختار الوحدة واكتب الكمية والسعر.')}
 function changeVariantUnit(vid,unit){const a=editAudit?editBuffer:state.draft;
  if(!a)return;const row=a.rows.find(r=>r.variants.some(v=>v.id===vid));const v=row?.variants.find(x=>x.id===vid);
  if(!v||v.unit===unit)return;if(row.variants.some(x=>x.id!==vid&&x.unit===unit)){notice('الوحدة دي موجودة بالفعل تحت الصنف.');render();return}
@@ -297,9 +299,31 @@ async function authPassword(action,email,password){const base=cloudBase();if(!em
  let resp;try{resp=await fetch(base+endpoint,{method:'POST',headers:{apikey:cloud.key,'Content-Type':'application/json'},body:JSON.stringify({email,password})})}catch{throw new Error('تعذر الاتصال بالسيرفر. جرب بعد الاتصال بالإنترنت.')}
  const data=await resp.json();if(!resp.ok)throw new Error(data.msg||data.error_description||data.message||'تعذر الدخول');
  cloud.email=email;saveCloudSettings();if(!data.access_token){notice('الحساب اتعمل؛ راجع البريد لتأكيد الإيميل ثم سجّل دخول.');return}
- token={access_token:data.access_token,refresh_token:data.refresh_token,expires_at:Date.now()+(data.expires_in||3600)*1000,userId:data.user.id};saveToken();notice('تم تسجيل الدخول. المزامنة لسه يدوية.');openSyncModal()}
-function openSyncModal(){modal('المزامنة اليدوية',`<p>برنامج الجرد مستقل. المزامنة الاختيارية تحتاج مشروع Supabase <b>منفصل</b> تُنشئ له الجدول الموجود في ملف الإعداد المرفق. مفيش أي اتصال بقاعدة بيانات برنامج المبيعات.</p><div class="sheet-info">${sync.dirty?'عندك تغييرات محفوظة على الجهاز لم تُرفع بعد.':'لا توجد تغييرات محلية معلقة حسب آخر مزامنة.'}<br>رقم النسخة على السيرفر عند هذا الجهاز: ${sync.rev}<br>الحساب: ${e(cloud.email||'لم يُحدد')} ${token?'• مُسجل':'• غير مُسجل'}</div><div class="field"><label>Supabase Project URL</label><input id="cloud-url" dir="ltr" placeholder="https://xxxxx.supabase.co" value="${e(cloud.url)}"></div><div class="field"><label>Publishable / anon key (ليس service_role)</label><input id="cloud-key" dir="ltr" placeholder="sb_publishable_..." value="${e(cloud.key)}"></div><div class="field"><label>إيميل الحساب الواحد</label><input id="cloud-email" type="email" dir="ltr" value="${e(cloud.email)}"></div><div class="field"><label>كلمة المرور</label><input type="password" id="cloud-password" autocomplete="off" placeholder="كلمة سر الحساب"></div><div class="actions"><button class="btn small muted" data-action="cloud-save">حفظ الإعدادات</button><button class="btn small" data-action="cloud-login">تسجيل دخول</button><button class="btn small" data-action="cloud-signup">إنشاء حساب</button></div><div class="modal-actions"><button class="btn primary" data-action="cloud-sync">⇄ مزامنة الآن</button><button class="btn muted" data-action="close-modal">إغلاق</button></div><hr style="border:0;border-top:1px solid #d6d6c7;margin:18px 0"><div class="actions"><button class="btn small" data-action="backup-export">تنزيل نسخة احتياطية</button><button class="btn small" data-action="backup-restore">استرجاع نسخة احتياطية</button></div><p class="fine">المزامنة لا تتم تلقائيًا. متعملش إزالة للتطبيق أو مسح بيانات المتصفح لو عندك تغييرات لم تتزامن.</p>`)}
-function readCloudFields(){cloud.url=$('#cloud-url')?.value.trim()||'';cloud.key=$('#cloud-key')?.value.trim()||'';cloud.email=$('#cloud-email')?.value.trim()||'';saveCloudSettings()}
+ if(sync.userId && sync.userId!==data.user.id){sync=initialSync();sync.dirty=true;}sync.userId=data.user.id;localStorage.setItem(META_KEY,JSON.stringify(sync));token={access_token:data.access_token,refresh_token:data.refresh_token,expires_at:Date.now()+(data.expires_in||3600)*1000,userId:data.user.id};saveToken();notice('تم تسجيل الدخول. المزامنة لسه يدوية.');openSyncModal()}
+function openSyncModal(){modal('المزامنة اليدوية',`<p>برنامج الجرد مستقل. المزامنة الاختيارية تحتاج مشروع Supabase <b>منفصل</b> تُنشئ له الجدول الموجود في ملف الإعداد المرفق. مفيش أي اتصال بقاعدة بيانات برنامج المبيعات.</p><div class="sheet-info">${sync.dirty?'عندك تغييرات محفوظة على الجهاز لم تُرفع بعد.':'لا توجد تغييرات محلية معلقة حسب آخر مزامنة.'}<br>رقم النسخة على السيرفر عند هذا الجهاز: ${sync.rev}<br>الحساب: ${e(cloud.email||'لم يُحدد')} ${token?'• مُسجل':'• غير مُسجل'}</div><p class="fine">سحابة جرد البوفيه المستقلة متوصلة تلقائيًا. سجل دخول أو أنشئ حسابًا، وبعدها اضغط مزامنة الآن.</p><div class="field"><label>إيميل الحساب الواحد</label><input id="cloud-email" type="email" dir="ltr" value="${e(cloud.email)}"></div><div class="field"><label>كلمة المرور</label><input type="password" id="cloud-password" autocomplete="off" placeholder="كلمة سر الحساب"></div><div class="actions"><button class="btn small muted" data-action="cloud-save">حفظ الإعدادات</button><button class="btn small" data-action="cloud-login">تسجيل دخول</button><button class="btn small" data-action="cloud-signup">إنشاء حساب</button></div><div class="modal-actions"><button class="btn primary" data-action="cloud-sync">⇄ مزامنة الآن</button><button class="btn muted" data-action="close-modal">إغلاق</button></div><hr style="border:0;border-top:1px solid #d6d6c7;margin:18px 0"><div class="actions"><button class="btn small" data-action="backup-export">تنزيل نسخة احتياطية</button><button class="btn small" data-action="backup-restore">استرجاع نسخة احتياطية</button><button class="btn small danger" data-action="factory-reset">إعادة ضبط المصنع (29 صنف)</button></div><p class="fine">المزامنة لا تتم تلقائيًا. متعملش إزالة للتطبيق أو مسح بيانات المتصفح لو عندك تغييرات لم تتزامن.</p>`)}
+function readCloudFields(){cloud.email=$('#cloud-email')?.value.trim()||'';saveCloudSettings()}
+function factoryState(){const fresh=deepClone(SEED_STATE);fresh.profit=defaultProfit();return fresh}
+async function factoryReset(){
+ if(!confirm('تأكيد إعادة ضبط جرد البوفيه؟\nهتتمسح الجردات السابقة والكميات والأسعار وبنود الربح من نسخة الجرد، وترجع الـ29 صنف الأصليين فقط. العملية لا تمس برنامج المبيعات.'))return;
+ if(!confirm('تأكيد نهائي: هل تريد تصفير كل بيانات الجرد والرجوع لنسخة جديدة تمامًا؟'))return;
+ // Keep a local recovery copy, and preserve the account/revision to prevent accidental cross-account writes.
+ saveSnapshotBackup('قبل تصفير الجرد وإرجاع 29 صنف');
+ const next=factoryState();
+ if(token?.userId){
+  if(!navigator.onLine){notice('التصفير الشامل يحتاج إنترنت لتصفير السحابة أيضًا. لم يتغير شيء.');return}
+  try{
+   const remote=await fetchRemote();
+   const revision=await pushRemote(remote.revision,next);
+   state=next;sync={rev:revision,base:deepClone(next),dirty:false,userId:token.userId};
+  }catch(err){notice('فشل تصفير السحابة، ولم يتم تغيير البيانات المحلية: '+(err.message||''));return}
+ }else{
+  // The signed-out local reset is not represented as a clean cloud state.
+  state=next;sync={...initialSync(),dirty:true,userId:sync.userId||null};
+ }
+ selectedAudit=null;editAudit=null;editBuffer=null;page='current';query='';
+ if(!persist(false)){notice('فشل الحفظ المحلي. لم يتم حذف النسخة الاحتياطية.');return}
+ closeModal();render();notice('تم التصفير ورجعت الـ29 صنف، والكميات والأسعار والجرد السابق فاضية.');
+}
 async function fetchRemote(){const user=token?.userId;if(!user)throw new Error('حساب الجرد مش معروف. سجل دخول الأول.');const data=await apiFetch('/rest/v1/inventory_documents?select=revision,snapshot&owner_id=eq.'+encodeURIComponent(user),{auth:true});
  if(!Array.isArray(data))throw new Error('رد السيرفر غير متوقع. تأكد من تثبيت الجدول وRLS.');return data.length?{revision:Number(data[0].revision),snapshot:data[0].snapshot}:{revision:0,snapshot:blankState()}}
 async function pushRemote(expected,snapshot){const result=await apiFetch('/rest/v1/rpc/inventory_commit',{method:'POST',body:{expected_revision:expected,new_snapshot:snapshot},auth:true});
@@ -340,7 +364,7 @@ let syncing=false;
 async function syncNow(){if(syncing)return;syncing=true;try{
  readCloudFields();await ensureAuth();const remote=await fetchRemote();if(!validState(remote.snapshot))throw new Error('بيانات السيرفر غير متوافقة. مش هنستبدل بيانات الجهاز.');
  if(remote.revision===sync.rev){
-   if(sync.dirty){const newRev=await pushRemote(remote.revision,deepClone(state));sync.rev=newRev;sync.base=deepClone(state);sync.dirty=false;persist(false);notice('تم رفع بيانات الجرد بنجاح.')}
+   if(sync.dirty || (remote.revision===0 && state.products.length>0)){const newRev=await pushRemote(remote.revision,deepClone(state));sync.rev=newRev;sync.base=deepClone(state);sync.dirty=false;persist(false);notice('تم رفع بيانات الجرد بنجاح.')}
    else if(remote.revision===0&&state.products.length===0){notice('لسه مفيش بيانات للمزامنة.')}
    else notice('الجهاز والسيرفر متزامنين بالفعل.');
    openSyncModal();return;
@@ -394,6 +418,7 @@ document.addEventListener('click',async event=>{
  case 'conflict-apply':await resolveConflicts();break;
  case 'backup-export':openExportBackup();break;
  case 'backup-restore':openRestoreBackup();break;
+ case 'factory-reset':await factoryReset();break;
  case 'restore-file-run':await restoreBackup();break;
  default:break
  }}catch(err){console.error(err);notice(err.message||'حصل خطأ؛ بيانات الجهاز لسه محفوظة.')}
