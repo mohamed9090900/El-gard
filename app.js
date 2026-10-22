@@ -1,6 +1,7 @@
 'use strict';
 /* جرد البوفيه — standalone local-first PWA. Does not fetch/mutate old buffet data. */
-const VERSION='1.0.0';
+const VERSION='1.2.0';
+const SEED_STATE={"schema":1,"categories":[{"id":"cat-seed-1","name":"بسكوت و كيك"},{"id":"cat-seed-2","name":"شاي و قهوة"},{"id":"cat-seed-3","name":"شيبسي و فشار"},{"id":"cat-seed-4","name":"كانز و عصير"},{"id":"cat-seed-5","name":"مأكولات"}],"products":[{"id":"product-seed-1-1","name":"اوريو صغير","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-1","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-2","name":"اوريو كبير","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-2","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-3","name":"اولكر شاي صغير","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-3","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-4","name":"اولكر شاي كبير","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-4","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-5","name":"اولكر عجوة","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-5","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-6","name":"بسكريم","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-6","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-7","name":"بسكوت شوفان","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-7","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-8","name":"بسكوت هالي","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-8","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-9","name":"توينكز صغير","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-9","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-10","name":"توينكز كبير","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-10","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-11","name":"فرسكا","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-11","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-12","name":"مولتو","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-12","unit":"","price":""}],"deleted":false},{"id":"product-seed-1-13","name":"هوهوز كينج","categoryId":"cat-seed-1","variants":[{"id":"variant-seed-1-13","unit":"","price":""}],"deleted":false},{"id":"product-seed-2-1","name":"اعشااب","categoryId":"cat-seed-2","variants":[{"id":"variant-seed-2-1","unit":"","price":""}],"deleted":false},{"id":"product-seed-2-2","name":"شاي","categoryId":"cat-seed-2","variants":[{"id":"variant-seed-2-2","unit":"","price":""}],"deleted":false},{"id":"product-seed-2-3","name":"قهوة","categoryId":"cat-seed-2","variants":[{"id":"variant-seed-2-3","unit":"","price":""}],"deleted":false},{"id":"product-seed-2-4","name":"كوفي ميكس","categoryId":"cat-seed-2","variants":[{"id":"variant-seed-2-4","unit":"","price":""}],"deleted":false},{"id":"product-seed-2-5","name":"نمرة سكر","categoryId":"cat-seed-2","variants":[{"id":"variant-seed-2-5","unit":"","price":""}],"deleted":false},{"id":"product-seed-2-6","name":"نيسكافيه 3 في 1","categoryId":"cat-seed-2","variants":[{"id":"variant-seed-2-6","unit":"","price":""}],"deleted":false},{"id":"product-seed-3-1","name":"دوريتوس","categoryId":"cat-seed-3","variants":[{"id":"variant-seed-3-1","unit":"","price":""}],"deleted":false},{"id":"product-seed-3-2","name":"شيبسى","categoryId":"cat-seed-3","variants":[{"id":"variant-seed-3-2","unit":"","price":""}],"deleted":false},{"id":"product-seed-3-3","name":"شيتوس","categoryId":"cat-seed-3","variants":[{"id":"variant-seed-3-3","unit":"","price":""}],"deleted":false},{"id":"product-seed-3-4","name":"صن بايتس","categoryId":"cat-seed-3","variants":[{"id":"variant-seed-3-4","unit":"","price":""}],"deleted":false},{"id":"product-seed-3-5","name":"فشار","categoryId":"cat-seed-3","variants":[{"id":"variant-seed-3-5","unit":"","price":""}],"deleted":false},{"id":"product-seed-4-1","name":"عصير","categoryId":"cat-seed-4","variants":[{"id":"variant-seed-4-1","unit":"","price":""}],"deleted":false},{"id":"product-seed-4-2","name":"كانز","categoryId":"cat-seed-4","variants":[{"id":"variant-seed-4-2","unit":"","price":""}],"deleted":false},{"id":"product-seed-4-3","name":"مياه كبيرة","categoryId":"cat-seed-4","variants":[{"id":"variant-seed-4-3","unit":"","price":""}],"deleted":false},{"id":"product-seed-5-1","name":"إندومي","categoryId":"cat-seed-5","variants":[{"id":"variant-seed-5-1","unit":"","price":""}],"deleted":false},{"id":"product-seed-5-2","name":"كاستر","categoryId":"cat-seed-5","variants":[{"id":"variant-seed-5-2","unit":"","price":""}],"deleted":false}],"audits":[],"draft":null,"importCompleted":true,"isDemo":false};
 const DB_KEY='gard_elbuffet_v1_state';
 const META_KEY='gard_elbuffet_v1_sync';
 const CLOUD_KEY='gard_elbuffet_v1_cloud';
@@ -19,7 +20,9 @@ const formatDate=ts=>new Date(ts).toLocaleString('ar-EG',{dateStyle:'medium',tim
 const blankState=()=>({schema:1,categories:[],products:[],audits:[],draft:null,importCompleted:false,isDemo:false});
 const initialSync=()=>({rev:0,base:null,dirty:false});
 function loadJson(key,fallback){try{const s=localStorage.getItem(key);return s?JSON.parse(s):fallback}catch{return fallback}}
-let state=loadJson(DB_KEY,blankState());
+let state=loadJson(DB_KEY,deepClone(SEED_STATE));
+const defaultProfit=()=>({entries:[{id:'officers',name:'حساب الضباط',amount:'',sign:1},{id:'wallet',name:'فلوس المحفظة',amount:'',sign:1},{id:'cash',name:'فلوس الكاش',amount:'',sign:1},{id:'debt',name:'الدين اللي عليك',amount:'',sign:-1},{id:'capital',name:'رأس المال',amount:'',sign:-1}],hospitality:''});
+if(!state.profit||!Array.isArray(state.profit.entries))state.profit=defaultProfit();
 let sync=loadJson(META_KEY,initialSync());
 let cloud=loadJson(CLOUD_KEY,{url:'',key:'',email:''});
 let token=loadJson(TOKEN_KEY,null);
@@ -37,7 +40,7 @@ function ensureDraft(){if(state.draft)return;state.draft={id:uniqueId(),startedA
 function makeRow(p){return{id:p.id,name:p.name,categoryId:p.categoryId||null,categoryName:catName(p.categoryId),variants:p.variants.map(v=>({id:v.id,unit:v.unit,price:v.price??'',qty:''}))}}
 function catName(id){return state.categories.find(c=>c.id===id)?.name||'بدون فئة'}
 function auditTotal(a){if(!a)return 0;return a.rows.reduce((s,row)=>s+row.variants.reduce((z,v)=>z+(validNum(v.qty)&&validNum(v.price)?num(v.qty)*num(v.price):0),0),0)}
-function draftReady(a){return Boolean(a&&a.rows.length&&a.rows.every(r=>r.variants.length&&r.variants.every(v=>validNum(v.qty)&&validNum(v.price))))}
+function draftReady(a){return Boolean(a&&a.rows.length&&a.rows.every(r=>r.variants.length&&r.variants.every(v=>Boolean(v.unit)&&validNum(v.qty)&&validNum(v.price))))}
 function auditCount(a){return a?.rows.reduce((s,r)=>s+r.variants.length,0)||0}
 function completedCount(a){return a?.rows.reduce((s,r)=>s+r.variants.filter(v=>validNum(v.qty)&&validNum(v.price)).length,0)||0}
 function snapshotRows(){return state.draft?.rows||[]}
@@ -46,8 +49,27 @@ function sortedRows(rows){return [...rows].sort((a,b)=>catSortKey(a.categoryId)-
 function pageTitle(text,actions=''){return`<div class="page-heading"><h2>${text}</h2><div class="actions">${actions}</div></div>`}
 function inputFor(v,field,context,editable=true){const value=v[field]??'';if(!editable)return`<span>${e(value)}</span>`;return`<input class="row-input ${field==='price'?'price':''}" type="number" inputmode="decimal" step="any" min="0" placeholder="—" value="${e(value)}" data-action="edit-field" data-ctx="${context}" data-variant="${e(v.id)}" data-field="${field}" aria-label="${field==='price'?'سعر الشراء':'الكمية'} ${e(v.unit)}">`}
 function renderInventory(a,{readOnly=false,historyMode=false,archiveMode=false}={}){
-  let rows=sortedRows(a?.rows||[]).filter(r=>!query||r.name.includes(query)||r.categoryName.includes(query)||r.variants.some(v=>v.unit.includes(query)));
-  if(!rows.length)return `<div class="empty">${query?'لا توجد أصناف تطابق البحث.':'لسه مفيش أصناف. اضغط «إضافة صنف» أو استورد الأسماء من برنامج البوفيه.'}</div>`;
+ if(historyMode)return renderComparisonInventory(a,{readOnly,historyMode,archiveMode});
+ const rows=sortedRows(a?.rows||[]).filter(r=>!query||r.name.includes(query)||r.categoryName.includes(query)||r.variants.some(v=>v.unit.includes(query)));
+ if(!rows.length)return `<div class="empty">${query?'لا توجد أصناف تطابق البحث.':'مفيش أصناف حاليًا.'}</div>`;
+ let html='<div class="compact-inventory">';let category='';
+ for(const r of rows){
+  if(category!==r.categoryName){category=r.categoryName;html+=`<h3 class="compact-category">${e(category)}</h3><div class="compact-head"><span>الصنف</span><span>العبوة</span><span>العدد</span><span>السعر</span><span>الإجمالي</span><span></span><span></span></div>`}
+  for(let i=0;i<r.variants.length;i++){
+   const v=r.variants[i],val=validNum(v.qty)&&validNum(v.price)?money(num(v.qty)*num(v.price)):'—';
+   html+=`<div class="compact-row data-row${i===r.variants.length-1?' item-last':''}"><span class="compact-name" title="${e(r.name)}">${e(r.name)}</span>`;
+   if(!readOnly)html+=`<select class="compact-unit" data-action="edit-unit" data-row="${e(r.id)}" data-variant="${e(v.id)}" aria-label="عبوة ${e(r.name)}"><option value="" ${!v.unit?'selected':''}>عبوة</option>${[...new Set([...UNITS,'زجاجة','باكت',v.unit])].filter(Boolean).map(u=>`<option value="${e(u)}" ${u===v.unit?'selected':''}>${e(u)}</option>`).join('')}</select>`;
+   else html+=`<span class="compact-unit-read">${e(v.unit||'—')}</span>`;
+   html+=`<div class="compact-input">${inputFor(v,'qty',editAudit?'archive':'draft',!readOnly)}</div><div class="compact-input">${inputFor(v,'price',editAudit?'archive':'draft',!readOnly)}</div><span class="compact-total">${val}</span>`;
+   html+=!readOnly&&!archiveMode?`<button class="compact-icon" data-action="add-variant" data-id="${e(r.id)}" title="إضافة عبوة" aria-label="إضافة عبوة">+</button><button class="compact-icon danger" data-action="delete-variant" data-id="${e(r.id)}" data-variant="${e(v.id)}" title="حذف السطر" aria-label="حذف السطر">×</button>`:'<span></span><span></span>';
+   html+='</div>';
+  }
+ }
+ return html+'</div>';
+}
+function renderComparisonInventory(a,opts){
+  let {readOnly=false,historyMode=false,archiveMode=false}=opts;let rows=sortedRows(a?.rows||[]).filter(r=>!query||r.name.includes(query)||r.categoryName.includes(query)||r.variants.some(v=>v.unit.includes(query)));
+  if(!rows.length)return `<div class="empty">${query?'لا توجد أصناف تطابق البحث.':'لسه مفيش أصناف. اضغط «إضافة صنف».'}</div>`;
   let html=`<div class="table-wrap"><table class="inventory-table${historyMode?' compare-table':''}"><thead><tr>`;
   if(historyMode)html+='<th>الصنف / الوحدة</th><th>السابق</th><th>الحالي</th><th>الفرق</th><th>القيمة</th>';
   else html+='<th>الصنف / الوحدة</th><th>الكمية</th><th>سعر الشراء</th><th>القيمة</th>';
@@ -70,6 +92,14 @@ function renderInventory(a,{readOnly=false,historyMode=false,archiveMode=false}=
   }
   return html+'</tbody></table></div>'
 }
+
+function deleteVariant(rowId,variantId){
+ const p=state.products.find(x=>x.id===rowId);const v=p?.variants.find(x=>x.id===variantId);if(!p||!v)return;
+ if(!confirm(`حذف سطر العبوة من «${p.name}»؟`))return;
+ if(p.variants.length===1){p.deleted=true;touchRowFromProduct(p)}
+ else{p.variants=p.variants.filter(x=>x.id!==variantId);touchRowFromProduct(p)}
+ persist();render();notice('اتحذف السطر من الجرد الجديد فقط.');
+}
 function getPriorVariant(aid,rowId,varId){const audits=state.audits;const idx=audits.findIndex(a=>a.id===aid);if(idx<=0)return null;const prior=audits[idx-1];const row=prior.rows.find(r=>r.id===rowId);return row?.variants.find(v=>v.id===varId)||null}
 function renderCurrent(){ensureDraft();const a=editAudit?editBuffer:state.draft;
  const heading=editAudit?'تعديل الجرد المحفوظ':'جدول الجرد الجديد';const headActions=editAudit?'':`<button class="btn small muted" data-action="product-add">+ إضافة صنف</button>`;
@@ -77,7 +107,7 @@ function renderCurrent(){ensureDraft();const a=editAudit?editBuffer:state.draft;
  if(editAudit)html+=`<p class="note">أنت بتعدّل جردًا محفوظًا. أي تعديل هنا هيغيّر هذا الجرد فقط، والجرد التالي هتتحدّث مقارنة كمياته تلقائيًا.</p>`;
  html+=`<div class="searchrow"><input id="product-search" class="search" placeholder="بحث عن صنف أو فئة..." value="${e(query)}" aria-label="بحث"></div>`;
  html+=renderInventory(a,{readOnly:false,archiveMode:!!editAudit});
- if(!editAudit)html+=`<div class="actions" style="margin-top:12px"><button class="btn" data-action="product-add">+ إضافة صنف</button><button class="btn" data-action="manage-categories">إدارة الفئات</button>${!state.importCompleted?'<button class="btn muted" data-action="import-modal">استيراد أصناف البوفيه</button>':''}${!state.products.length&&!state.audits.length?'<button class="btn copper" data-action="load-demo">تجربة بأصناف مثال</button>':''}${state.isDemo?'<button class="btn danger" data-action="clear-demo">مسح بيانات المثال</button>':''}</div>`;
+ if(!editAudit)html+=`<div class="actions" style="margin-top:12px"><button class="btn" data-action="product-add">+ إضافة صنف</button><button class="btn" data-action="manage-categories">إدارة الفئات</button></div>`;
  const total=auditTotal(a);const complete=draftReady(a);
  html+=`<div class="moneybar"><span>إجمالي الجرد</span><strong>${money(total)} ج</strong></div>`;
  html+=`<div class="bottom-buttons">${editAudit?`<button class="btn primary" data-action="save-history" ${!complete?'disabled':''}>حفظ التعديل</button><button class="btn muted" data-action="cancel-history-edit">إلغاء</button>`:`<button class="btn primary" data-action="finish-audit" ${!complete?'disabled':''}>إنهاء وحفظ الجرد</button>`}</div>`;
@@ -92,7 +122,24 @@ function renderHistory(){if(selectedAudit){const a=state.audits.find(x=>x.id===s
  for(const a of [...state.audits].reverse())html+=`<div class="history-card"><div><strong>${formatDate(a.completedAt)}</strong><br><span>${a.rows.length} أصناف • ${auditCount(a)} وحدة</span><div class="actions" style="margin-top:8px"><button class="btn small" data-action="history-open" data-id="${e(a.id)}">عرض</button><button class="btn small muted" data-action="history-edit" data-id="${e(a.id)}">تعديل</button></div></div><div class="history-total">${money(auditTotal(a))} ج</div></div>`;
  return html;
 }
-function render(){document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===page));$('#main-content').innerHTML=page==='history'?renderHistory():renderCurrent();updateIndicators()}
+function renderProfit(){
+ if(!state.profit||!Array.isArray(state.profit.entries))state.profit=defaultProfit();
+ const p=state.profit;const stock=state.audits.length?state.audits.at(-1):state.draft;
+ const stockValue=auditTotal(stock);const cashTotal=p.entries.reduce((sum,x)=>sum+(validNum(x.amount)?num(x.amount)*x.sign:0),0);
+ const result=cashTotal+stockValue;
+ let html=pageTitle('صافي الربح',`<button class="btn small muted" data-action="profit-add">+ إضافة بند</button>`);
+ html+=`<p class="note">دي حسبة قيمة المشروع بعد خصم رأس المال والديون. قيمة البضاعة من ${state.audits.length?'آخر جرد محفوظ':'الجرد الحالي غير المكتمل'}، وباقي الأرقام بتدخلها بنفسك.</p>`;
+ html+=`<div class="profit-summary"><span>صافي الربح المحسوب</span><strong class="${result<0?'profit-negative':''}">${money(result)} جنيه</strong></div>`;
+ html+=`<div class="profit-stock"><span>+ قيمة البضاعة المتبقية (بسعر الشراء)</span><strong>${money(stockValue)} ج</strong></div>`;
+ html+=`<div class="profit-entries">`;
+ for(const item of p.entries)html+=`<div class="profit-entry"><input aria-label="اسم البند" class="profit-name" data-profit-id="${e(item.id)}" data-profit-field="name" value="${e(item.name)}"><select aria-label="جمع أو طرح" data-profit-id="${e(item.id)}" data-profit-field="sign"><option value="1" ${item.sign===1?'selected':''}>+ جمع</option><option value="-1" ${item.sign===-1?'selected':''}>− طرح</option></select><input aria-label="قيمة البند" class="profit-amount" type="number" inputmode="decimal" step="any" min="0" placeholder="المبلغ" data-profit-id="${e(item.id)}" data-profit-field="amount" value="${e(item.amount)}"><button class="profit-delete" type="button" aria-label="حذف البند" data-action="profit-delete" data-id="${e(item.id)}">✕</button></div>`;
+ html+=`</div><div class="actions" style="margin-top:12px"><button class="btn" data-action="profit-add">+ إضافة بند جديد</button></div>`;
+ html+=`<div class="profit-hospitality"><label for="profit-hospitality">تكلفة الضيافة بسعر الشراء (للعرض فقط)</label><input id="profit-hospitality" type="number" inputmode="decimal" min="0" step="any" placeholder="0" value="${e(p.hospitality)}"><p class="fine">الضيافة اللي خرجت من المخزن قللت قيمة البضاعة بالفعل، لذلك لا نطرحها مرة ثانية.</p></div>`;
+ html+=`<p class="hint">تنبيه: لو سحبت أرباح أو ضفت رأس مال، سجّل الحركات دي في البنود المناسبة عشان الحسبة تكون دقيقة. القيم محفوظة محليًا وتدخل ضمن النسخ الاحتياطية والمزامنة اليدوية.</p>`;
+ return html;
+}
+function updateProfitTotal(){const p=state.profit;const stock=state.audits.length?state.audits.at(-1):state.draft;const total=auditTotal(stock)+p.entries.reduce((sum,x)=>sum+(validNum(x.amount)?num(x.amount)*x.sign:0),0);const node=document.querySelector('.profit-summary strong');if(node){node.textContent=money(total)+' جنيه';node.classList.toggle('profit-negative',total<0)}}
+function render(){document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===page));$('#main-content').innerHTML=page==='history'?renderHistory():page==='profit'?renderProfit():renderCurrent();updateIndicators()}
 function touchRowFromProduct(p){if(!state.draft)return;const existing=state.draft.rows.find(r=>r.id===p.id);
  if(!existing){if(!p.deleted)state.draft.rows.push(makeRow(p));return}
  if(p.deleted){state.draft.rows=state.draft.rows.filter(r=>r.id!==p.id);return}
@@ -112,14 +159,15 @@ function setRowValue(rowId,variantId,field,value,archive=false){const a=archive?
 function updateSummary(a){const bar=$('.moneybar strong');if(bar)bar.textContent=money(auditTotal(a))+' ج';
  const save=$('[data-action="finish-audit"]')||$('[data-action="save-history"]');if(save)save.disabled=!draftReady(a);
  // value column can refresh only affected row to avoid losing focus
- document.querySelectorAll('.data-row').forEach(tr=>{const q=tr.querySelector('[data-field="qty"]');const p=tr.querySelector('[data-field="price"]');if(q&&p){const qn=num(q.value),pn=num(p.value),td=tr.querySelector('td:last-child');if(td)td.textContent=validNum(q.value)&&validNum(p.value)?money(qn*pn):'—'}})
+ document.querySelectorAll('.data-row').forEach(tr=>{const q=tr.querySelector('[data-field="qty"]');const p=tr.querySelector('[data-field="price"]');if(q&&p){const qn=num(q.value),pn=num(p.value),td=tr.querySelector('.compact-total')||tr.querySelector('td:last-child');if(td)td.textContent=validNum(q.value)&&validNum(p.value)?money(qn*pn):'—'}})
 }
 function saveSnapshotBackup(label){const b=loadJson(BACKUP_KEY,[]);b.unshift({createdAt:new Date().toISOString(),label,state:deepClone(state)});try{localStorage.setItem(BACKUP_KEY,JSON.stringify(b.slice(0,5)))}catch(err){console.warn('Local backup full',err)}}
 function finishAudit(){if(!draftReady(state.draft)){notice('كمّل كل الكميات والأسعار الأول.');return}
+ if(!confirm('إنهاء الجرد وحفظه في السجل؟'))return;
  saveSnapshotBackup('قبل إنهاء الجرد');
  const audit={id:uniqueId(),startedAt:state.draft.startedAt,completedAt:new Date().toISOString(),rows:deepClone(state.draft.rows)};
  state.audits.push(audit);state.draft=null;selectedAudit=audit.id;page='history';persist();render();notice('اتحفظ الجرد. وتقدر ترجعله وتعدّله في أي وقت.')}
-function updateArchivedAudit(){if(!editAudit||!editBuffer||!draftReady(editBuffer))return;const i=state.audits.findIndex(x=>x.id===editAudit);if(i<0)return;saveSnapshotBackup('قبل تعديل جرد قديم');editBuffer.editedAt=new Date().toISOString();state.audits[i]=deepClone(editBuffer);selectedAudit=editAudit;editAudit=null;editBuffer=null;page='history';persist();render();notice('اتحفظ التعديل، والفروق اتحدثت تلقائيًا.')}
+function updateArchivedAudit(){if(!editAudit||!editBuffer||!draftReady(editBuffer))return;if(!confirm('حفظ التعديلات على الجرد القديم؟'))return;const i=state.audits.findIndex(x=>x.id===editAudit);if(i<0)return;saveSnapshotBackup('قبل تعديل جرد قديم');editBuffer.editedAt=new Date().toISOString();state.audits[i]=deepClone(editBuffer);selectedAudit=editAudit;editAudit=null;editBuffer=null;page='history';persist();render();notice('اتحفظ التعديل، والفروق اتحدثت تلقائيًا.')}
 function optionHtml(options,current){return options.map(({id,name})=>`<option value="${e(id)}"${id===current?' selected':''}>${e(name)}</option>`).join('')}
 function modal(title,body){$('#modal-root').innerHTML=`<div class="overlay" id="overlay"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal-head"><h2 id="modal-title">${e(title)}</h2><button class="close" data-action="close-modal" aria-label="إغلاق">×</button></div>${body}</div></div>`}
 function closeModal(){$('#modal-root').innerHTML=''}
@@ -134,7 +182,7 @@ function saveProduct(form){const id=form.dataset.product;const name=$('#product-
  const rows=[...document.querySelectorAll('#variant-form-rows .unit-row')];const variants=rows.map(el=>({id:el.dataset.id,unit:el.querySelector('.variant-unit').value,price:el.querySelector('.variant-price').value}));
  if(!name){notice('اكتب اسم الصنف.');return}if(!variants.length){notice('لازم تضيف وحدة واحدة على الأقل.');return}
  if(new Set(variants.map(x=>x.unit)).size!==variants.length){notice('مينفعش نفس الوحدة تتكرر للصنف الواحد.');return}
- if(variants.some(v=>!validNum(v.price))){notice('اكتب سعر شراء صحيح لكل وحدة.');return}
+ if(variants.some(v=>v.price!==''&&!validNum(v.price))){notice('اكتب سعر شراء صحيح لكل وحدة.');return}
  if(state.products.some(p=>p.id!==id&&!p.deleted&&p.name.trim().toLocaleLowerCase('ar')===name.toLocaleLowerCase('ar'))){notice('الصنف ده موجود بالفعل.');return}
  if(id){const p=state.products.find(p=>p.id===id);p.name=name;p.categoryId=categoryId;p.variants=variants;touchRowFromProduct(p)}
  else{const p={id:uniqueId(),name,categoryId,variants,deleted:false};state.products.push(p);touchRowFromProduct(p)}
@@ -153,7 +201,7 @@ function deleteCategory(id){const c=state.categories.find(c=>c.id===id);if(!c)re
 function deleteProduct(id){const p=state.products.find(p=>p.id===id);if(!p)return;
  if(!confirm(`حذف «${p.name}» من الجرد الجديد؟\nهيفضل موجود في كل الجردات القديمة ومش هتتغير قيمتها.`))return;
  p.deleted=true;touchRowFromProduct(p);persist();render();notice('الصنف اتحذف من الجرد الجديد فقط؛ الأرشيف محفوظ.')}
-function addVariant(id){const p=state.products.find(p=>p.id===id);if(!p)return;const unit=UNITS.find(u=>!p.variants.some(v=>v.unit===u));if(!unit){notice('كل الوحدات المتاحة مستخدمة لهذا الصنف.');return}
+function addVariant(id){const p=state.products.find(p=>p.id===id);if(!p)return;const unit='';if(!unit){notice('كل الوحدات المتاحة مستخدمة لهذا الصنف.');return}
  p.variants.push({id:uniqueId(),unit,price:''});touchRowFromProduct(p);persist();render();notice('اتضاف سطر للعبوة الجديدة. اكتب سعرها وكميتها.')}
 function changeVariantUnit(vid,unit){const a=editAudit?editBuffer:state.draft;
  if(!a)return;const row=a.rows.find(r=>r.variants.some(v=>v.id===vid));const v=row?.variants.find(x=>x.id===vid);
@@ -317,6 +365,7 @@ document.addEventListener('click',async event=>{
  case 'product-edit':openProductForm(id);break;
  case 'product-delete':deleteProduct(id);break;
  case 'add-variant':addVariant(id);break;
+ case 'delete-variant':deleteVariant(id,el.dataset.variant);break;
  case 'manage-categories':openCategoryModal();break;
  case 'category-create':{const c=createCategory($('#new-category-name')?.value||'');if(c){openCategoryModal();render();notice('اتضافت الفئة.')}break}
  case 'category-rename':renameCategory(id);break;
@@ -324,10 +373,12 @@ document.addEventListener('click',async event=>{
  case 'category-add-inline':{const name=prompt('اسم الفئة الجديدة:');if(name!==null){const c=createCategory(name);if(c){const select=$('#product-category');select.insertAdjacentHTML('beforeend',`<option value="${e(c.id)}">${e(c.name)}</option>`);select.value=c.id;notice('اتضافت الفئة.')}}break}
  case 'variant-form-add':{const holder=$('#variant-form-rows'),used=[...holder.querySelectorAll('.variant-unit')].map(e=>e.value),unit=UNITS.find(u=>!used.includes(u));if(!unit)return notice('كل الوحدات مستخدمة.');holder.insertAdjacentHTML('beforeend',variantFormRow({id:uniqueId(),unit,price:''}));break}
  case 'variant-form-delete':{const holder=$('#variant-form-rows');if(holder.children.length<=1)return notice('لازم وحدة واحدة على الأقل.');el.closest('.unit-row').remove();break}
- case 'import-modal':openImportModal();break;
- case 'load-demo':loadExampleData();break;
- case 'clear-demo':clearExampleData();break;
- case 'import-file-run':await importBuffetFile();break;
+
+
+
+
+ case 'profit-add':state.profit.entries.push({id:uniqueId(),name:'بند جديد',amount:'',sign:1});persist();render();break;
+ case 'profit-delete':{const item=state.profit.entries.find(x=>x.id===id);if(item&&confirm('حذف بند «'+item.name+'» من حساب صافي الربح؟')){state.profit.entries=state.profit.entries.filter(x=>x.id!==id);persist();render()}break}
  case 'finish-audit':finishAudit();break;
  case 'history-list':selectedAudit=null;render();break;
  case 'history-open':selectedAudit=id;query='';render();break;
@@ -350,6 +401,8 @@ document.addEventListener('click',async event=>{
 document.addEventListener('submit',event=>{if(event.target.id==='product-form'){event.preventDefault();saveProduct(event.target)}});
 document.addEventListener('input',event=>{
  const el=event.target;
+ if(el.id==='profit-hospitality'){state.profit.hospitality=el.value;persist();return}
+ if(el.dataset.profitId&&el.dataset.profitField!=='sign'){const item=state.profit.entries.find(x=>x.id===el.dataset.profitId);if(item){item[el.dataset.profitField]=el.value;persist();updateProfitTotal()}return}
  if(el.id==='product-search'){
    query=el.value;const start=el.selectionStart,end=el.selectionEnd;render();const input=$('#product-search');input?.focus();if(input)input.setSelectionRange(start,end);return
  }
@@ -359,6 +412,7 @@ document.addEventListener('input',event=>{
 });
 document.addEventListener('change',event=>{
  const el=event.target;
+ if(el.dataset.profitId&&el.dataset.profitField==='sign'){const item=state.profit.entries.find(x=>x.id===el.dataset.profitId);if(item){item.sign=Number(el.value)===-1?-1:1;persist();updateProfitTotal()}return}
  if(el.dataset.action==='edit-unit')changeVariantUnit(el.dataset.variant,el.value);
  if(el.matches('.variant-unit')){const row=el.closest('.unit-row');if(row){const p=row.querySelector('.variant-price');if(p)p.value=''}}
 });
@@ -366,7 +420,7 @@ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&$('#overlay
 document.addEventListener('click',event=>{if(event.target.id==='overlay')closeModal()});
 $('#sync-open').addEventListener('click',openSyncModal);
 window.addEventListener('storage',e=>{if(e.key===DB_KEY&&e.newValue!==JSON.stringify(state)){hasTabCollision=true;notice('في تعديل من تبويب تاني. حدّث الصفحة أولًا عشان متكتبش فوق البيانات الجديدة.')}});
-if(!validState(state)){state=blankState();sync=initialSync();persist(false)}
+if(!validState(state)){state=deepClone(SEED_STATE);state.profit=defaultProfit();sync=initialSync();persist(false)}
 updateIndicators();render();
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('SW:',err)));
 window.__gardTest={getState:()=>deepClone(state),getSync:()=>deepClone(sync),auditTotal,makeXlsx,mergeThree,validState};
